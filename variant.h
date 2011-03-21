@@ -137,6 +137,7 @@ private:
 	class container_base
 	{
 	public:
+		virtual ~container_base() {}
 		virtual container_base *clone() const = 0;
 	};
 

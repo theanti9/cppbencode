@@ -1,0 +1,21 @@
+CXX = g++
+CXXFLAGS = -O2 -W -Wall -g -fPIC -shared
+OBJS = bencode.o
+LIB = libcppbencode.so
+PREFIX = {PREFIX}
+LIBPATH = {LIBPATH}
+
+all: $(LIB)
+	cd example && $(MAKE)
+	cd tests && $(MAKE)
+
+$(LIB): $(OBJS)
+	$(CXX) $(CXXFLAGS) -Wl,-soname,$(LIB) -o $(LIB) $(OBJS)
+
+install:
+	install -m 755 $(LIB) $(DESTDIR)$(LIBPATH)
+	mkdir -p -m 755 $(DESTDIR)$(PREFIX)/include/cppbencode
+	install -m 644 bencode.h common.h variant.h $(DESTDIR)$(PREFIX)/include/cppbencode
+
+clean:
+	rm -rf $(OBJS) $(LIB)

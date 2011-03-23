@@ -5,10 +5,12 @@
 #include <string>
 #include <assert.h>
 
-class bdecoder {
+namespace ben {
+
+class decoder {
 public:
-	bdecoder(const std::string &buf);
-	~bdecoder();
+	decoder(const std::string &buf);
+	~decoder();
 
 	const char *error() const { return m_error; }
 	int pos() const { return m_pos; }
@@ -20,7 +22,7 @@ public:
 
 	static int decode_all(variant *value, const std::string &buf)
 	{
-		bdecoder decoder(buf);
+		decoder decoder(buf);
 		if (decoder.decode(value))
 			return -1;
 		if (!decoder.at_end())
@@ -39,6 +41,8 @@ private:
 	bool validate_int(const std::string &s);
 };
 
-int bencode(std::string *out, const variant &value);
+int encode(std::string *out, const variant &value);
+
+}
 
 #endif

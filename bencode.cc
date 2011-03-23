@@ -17,7 +17,9 @@ const int MAX_DEPTH = 64;
 #define NO_LEADING_SPACES
 #define NO_LEADING_ZEROES
 
-static int bencode_string(std::string *out, const std::string &s)
+namespace ben {
+
+int encode_string(std::string *out, const std::string &s)
 {
 	char length[16];
 	sprintf(length, "%zd:", s.size());
@@ -25,7 +27,7 @@ static int bencode_string(std::string *out, const std::string &s)
 	return 0;
 }
 
-int bencode(std::string *out, const variant &value)
+int encode(std::string *out, const variant &value)
 {
 	variant_map dict;
 	variant_list list;
@@ -38,8 +40,8 @@ int bencode(std::string *out, const variant &value)
 		*out += 'd';
 		for (map_const_iter<std::string, variant> i(dict); i.valid();
 		     i.next()) {
-			bencode_string(out, i.key());
-			if (bencode(out, *i))
+			encode_string(out, i.key());
+			if (encode(out, *i))
 				return -1;
 		}
 		*out += 'e';
@@ -47,7 +49,7 @@ int bencode(std::string *out, const variant &value)
 	} else if (value.get(&list) == 0) {
 		*out += 'l';
 		for (list_const_iter<variant> i(list); i.valid(); i.next()) {
-			if (bencode(out, *i))
+			if (encode(out, *i))
 				return -1;
 		}
 		*out += 'e';
@@ -66,7 +68,7 @@ int bencode(std::string *out, const variant &value)
 		*out += b ? "b1" : "b0";
 
 	} else if (value.get(&s) == 0) {
-		bencode_string(out, s);
+		encode_string(out, s);
 
 	} else {
 		fprintf(stderr, "Unable to bencode\n");
@@ -76,7 +78,7 @@ int bencode(std::string *out, const variant &value)
 	return 0;
 }
 
-int bdecoder::decode_string(std::string *s)
+int decoder::decode_string(std::string *s)
 {
 	size_t end = m_buf.find(':', m_pos);
 	if (end == std::string::npos || end >= m_len) {
@@ -104,17 +106,17 @@ int bdecoder::decode_string(std::string *s)
 	return 0;
 }
 
-bdecoder::bdecoder(const std::string &buf) :
+decoder::decoder(const std::string &buf) :
 	m_buf(buf), m_pos(0), m_len(buf.size()), m_depth(0), m_error(NULL)
 {
 }
 
-bdecoder::~bdecoder()
+decoder::~decoder()
 {
 	free(m_error);
 }
 
-int bdecoder::decode(variant *value)
+int decoder::decode(variant *value)
 {
 	if (m_pos >= m_len) {
 		set_error("Input overrun");
@@ -213,7 +215,7 @@ int bdecoder::decode(variant *value)
 	return 0;
 }
 
-void bdecoder::set_error(const char *fmt, ...)
+void decoder::set_error(const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
@@ -221,7 +223,7 @@ void bdecoder::set_error(const char *fmt, ...)
 	va_end(ap);
 }
 
-bool bdecoder::validate_int(const std::string &s)
+bool decoder::validate_int(const std::string &s)
 {
 #ifdef NO_LEADING_SPACES
 	if (s.size() >= 1 && isspace(s[0])) {
@@ -236,4 +238,6 @@ bool bdecoder::validate_int(const std::string &s)
 	}
 #endif
 	return true;
+}
+
 }

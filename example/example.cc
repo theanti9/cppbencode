@@ -12,8 +12,8 @@ public:
 	{
 	}
 
-	int load(const variant &v);
-	variant save() const;
+	int load(const ben::variant &v);
+	ben::variant save() const;
 
 	void display() const;
 
@@ -24,13 +24,13 @@ public:
 
 private:
 	std::string m_name;
-	map<std::string, std::string> m_contacts;
+	ben::map<std::string, std::string> m_contacts;
 	int m_age;
 };
 
-int user::load(const variant &v)
+int user::load(const ben::variant &v)
 {
-	variant_map d;
+	ben::variant_map d;
 	if (v.get(&d) ||
 	    d.get("name").get(&m_name) ||
 	    d.get("age").get(&m_age) ||
@@ -43,9 +43,9 @@ int user::load(const variant &v)
 	return 0;
 }
 
-variant user::save() const
+ben::variant user::save() const
 {
-	variant_map d;
+	ben::variant_map d;
 	d.insert("name", m_name);
 	d.insert("age", m_age);
 	d.insert("contacts", m_contacts);
@@ -56,7 +56,7 @@ void user::display() const
 {
 	printf("%s, %d\n", m_name.c_str(), m_age);
 	printf("----------------\n");
-	for (map_const_iter<std::string, std::string> i(m_contacts);
+	for (ben::map_const_iter<std::string, std::string> i(m_contacts);
 	     i.valid(); i.next()) {
 		printf("%s = %s\n", i.key().c_str(), i->c_str());
 	}
@@ -69,16 +69,16 @@ int load_users(const char *fname)
 	std::string buf = load_file(fname);
 	if (buf.empty())
 		return -1;
-	variant data;
-	variant_list list;
-	if (bdecoder::decode_all(&data, buf))
+	ben::variant data;
+	ben::variant_list list;
+	if (ben::decoder::decode_all(&data, buf))
 		return -1;
 
 	if (data.get(&list))
 		return -1;
 
 	users.clear();
-	for (list_iter<variant> i(list); i.valid(); i.next()) {
+	for (ben::list_iter<ben::variant> i(list); i.valid(); i.next()) {
 		user user;
 		if (user.load(*i))
 			return -1;
@@ -90,12 +90,12 @@ int load_users(const char *fname)
 
 int save_users(const char *fname)
 {
-	variant_list list;
-	for (list_iter<user> i(users); i.valid(); i.next()) {
+	ben::variant_list list;
+	for (ben::list_iter<user> i(users); i.valid(); i.next()) {
 		list.push_back(i->save());
 	}
 	std::string buf;
-	if (bencode(&buf, list))
+	if (ben::encode(&buf, list))
 		return -1;
 	return write_file(fname, buf);
 }
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
 			users.push_back(user);
 
 		} else if (cmd == "list") {
-			for (list_iter<user> i(users); i.valid(); i.next()) {
+			for (ben::list_iter<user> i(users); i.valid(); i.next()) {
 				i->display();
 				printf("\n");
 			}

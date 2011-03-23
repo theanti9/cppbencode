@@ -4,6 +4,8 @@
 #include <list>
 #include <map>
 
+namespace ben {
+
 template<class T>
 class list_iter {
 public:
@@ -241,5 +243,7 @@ private:
 	typename map<Key, Value>::iterator next_i;
 	typename map<Key, Value>::iterator end;
 };
+
+}
 
 #endif

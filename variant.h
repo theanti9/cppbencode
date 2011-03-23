@@ -5,6 +5,8 @@
 #include <list>
 #include <string>
 
+namespace ben {
+
 class variant;
 typedef std::list<variant> variant_list;
 typedef map<std::string, variant> variant_map;
@@ -163,5 +165,7 @@ private:
 
 	container_base *m_container;
 };
+
+}
 
 #endif

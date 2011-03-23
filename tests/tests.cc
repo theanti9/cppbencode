@@ -7,8 +7,8 @@ template<class T>
 void test_decode(const T &expected, const std::string &buf)
 {
 	/* test decode */
-	variant data;
-	if (bdecoder::decode_all(&data, buf)) {
+	ben::variant data;
+	if (ben::decoder::decode_all(&data, buf)) {
 		printf("WARNING: unable to decode\n");
 		printf("input: %s\n", buf.c_str());
 		return;
@@ -29,8 +29,8 @@ void test_decode(const T &expected, const std::string &buf)
 
 	/* test encode */
 	std::string encoded;
-	if (bencode(&encoded, expected)) {
-		printf("WARNING: unable to bencode\n");
+	if (ben::encode(&encoded, expected)) {
+		printf("WARNING: unable to encode\n");
 		return;
 	}
 	if (encoded != buf) {
@@ -43,8 +43,8 @@ void test_decode(const T &expected, const std::string &buf)
 
 void test_invalid_bencode(const std::string &buf)
 {
-	variant data;
-	if (bdecoder::decode_all(&data, buf) == 0) {
+	ben::variant data;
+	if (ben::decoder::decode_all(&data, buf) == 0) {
 		printf("WARNING: unexpected: able to decode\n");
 		printf("input: %s\n", buf.c_str());
 		return;
@@ -54,8 +54,8 @@ void test_invalid_bencode(const std::string &buf)
 template<class T>
 void test_invalid_type(const std::string &buf)
 {
-	variant data;
-	if (bdecoder::decode_all(&data, buf)) {
+	ben::variant data;
+	if (ben::decoder::decode_all(&data, buf)) {
 		printf("WARNING: unable to decode\n");
 		printf("input: %s\n", buf.c_str());
 		return;
@@ -87,7 +87,7 @@ int main(int argc, char **argv)
 	test_invalid_type<std::string>("i1234e");
 	test_invalid_type<std::string>("de");
 
-	map<std::string, std::string> sd;
+	ben::map<std::string, std::string> sd;
 	test_decode(sd, "de");
 	sd.insert("foo", "bar");
 	sd.insert("foz", "baz");
@@ -95,7 +95,8 @@ int main(int argc, char **argv)
 	test_invalid_bencode("d3:foo3:bar3:foz3:baz");
 	test_invalid_bencode("d3:foo3:bar1234");
 	test_invalid_bencode("d3:foo3:bari1234e");
-	test_invalid_type<map<std::string, std::string> >("d3:foo3:bar3:fozi1234ee");
+	test_invalid_type<ben::map<std::string, std::string> >
+		("d3:foo3:bar3:fozi1234ee");
 
 	std::list<std::string> sl;
 	test_decode(sl, "le");
